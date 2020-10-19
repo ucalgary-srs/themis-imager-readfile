@@ -12,7 +12,7 @@ Python library for reading THEMIS All-Sky Imager (ASI) stream0 raw PGM-file data
 The themis-imager-readfile library is available on PyPI:
 
 ```console
-$ python -m pip install themis-imager-readfile
+$ python3 -m pip install themis-imager-readfile
 ```
 
 ## Supported Python Versions
