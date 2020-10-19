@@ -27,7 +27,7 @@ Import the library using `import themis_imager_readfile`
 
 ```python
 >>> import themis_imager_readfile
->>> filename = "path/to/data/2020/01/01/atha_themis02/ut06/20200101_0600_atha_themis02_full.pgm.gz
+>>> filename = "path/to/data/2020/01/01/atha_themis02/ut06/20200101_0600_atha_themis02_full.pgm.gz"
 >>> img, meta, problematic_files = themis_imager_readfile.read(filename)
 ```
 
