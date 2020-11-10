@@ -26,33 +26,43 @@ This readfile can be used in a couple of different ways. Below are a few ways:
 
 ### Read a single one-minute file
 
-<pre>IDL> themis_imager_readfile_new,filename,img,meta
+```
+IDL> themis_imager_readfile_new,filename,img,meta
 IDL> help,img
 IMG             UINT      = Array[256, 256, 20]
 IDL> help,meta
-META            STRUCT    = -> THEMIS_IMAGER_METADATA Array[20]</pre>
+META            STRUCT    = -> THEMIS_IMAGER_METADATA Array[20]
+```
 
 ### Read multiple files (ie. one hour worth)
 
-<pre>IDL> f=file_search("C:\path\to\files\for\an\hour\*")
+```
+IDL> f=file_search("C:\path\to\files\for\an\hour\*")
 IDL> themis_imager_readfile_new,f,img,meta
 IDL> help,img
 IMG             UINT      = Array[256, 256, 1200]
 IDL> help,meta
-META            STRUCT    = -> THEMIS_IMAGER_METADATA Array[1200]</pre>
+META            STRUCT    = -> THEMIS_IMAGER_METADATA Array[1200]
+```
 
 ### Read file and populate all metadata fields
 
-<pre>IDL> themis_imager_readfile_new,filename,img,meta,/all_metadata</pre>
+```
+IDL> themis_imager_readfile_new,filename,img,meta,/all_metadata
+```
 
 ### Read only the first frame of a file (can be used to speed up performance if you only need the first frame)
 
-<pre>IDL> themis_imager_readfile_first_frame,filename,img,meta,/first_frame
+```
+IDL> themis_imager_readfile_first_frame,filename,img,meta,/first_frame
 IDL> help,img
 IMG             UINT      = Array[256, 256]
 IDL> help,meta
-String          STRUCT    = -> THEMIS_IMAGER_METADATA</pre>
+String          STRUCT    = -> THEMIS_IMAGER_METADATA
+```
 
 ### Read file without processing metadata (file has no metadata or you just don't want to read it)
 
-<pre>IDL> themis_imager_readfile_no_meta,filename,img,meta,/no_metadata</pre>
+```
+IDL> themis_imager_readfile_no_meta,filename,img,meta,/no_metadata
+```
