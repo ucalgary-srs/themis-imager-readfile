@@ -4,4 +4,4 @@
 
 This repository contains code for reading THEMIS All-Sky Imager (ASI) stream0 raw PGM-file data. The data can be found at https://data.phys.ucalgary.ca or http://themis.igpp.ucla.edu/index.shtml.
 
-There exist readfile software for both IDL and Python. Navigate to each language subdirectory in this repository to see their specific readmes.
+There exists readfile software for both IDL and Python. Navigate to each language subdirectory in this repository to see their specific readmes.
