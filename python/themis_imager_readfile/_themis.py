@@ -46,6 +46,7 @@ def read(file_list, workers=1):
         data = pool.map(__themis_readfile_worker, file_list)
     except KeyboardInterrupt:
         pool.terminate()  # gracefully kill children
+        return images, metadata_dict_list, problematic_file_list
     else:
         pool.close()
 
