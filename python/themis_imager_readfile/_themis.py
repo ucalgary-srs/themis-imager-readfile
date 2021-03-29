@@ -46,7 +46,7 @@ def read(file_list, workers=1):
         data = pool.map(__themis_readfile_worker, file_list)
     except KeyboardInterrupt:
         pool.terminate()  # gracefully kill children
-        return np.empty((), dtype=THEMIS_DT), [], []
+        return np.empty((0, 0, 0), dtype=THEMIS_DT), [], []
     else:
         pool.close()
 
