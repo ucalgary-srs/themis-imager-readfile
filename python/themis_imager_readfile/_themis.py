@@ -2,6 +2,7 @@
 # Date: 2020-10-16
 
 import gzip
+import bz2
 import numpy as np
 import signal
 from multiprocessing import Pool
@@ -102,6 +103,8 @@ def __themis_readfile_worker(file):
             unzipped = gzip.open(file, mode='rb')
         elif file.endswith("pgm"):
             unzipped = open(file, mode='rb')
+        elif file.endswith("pgm.bz2"):
+            unzipped = bz2.open(file, mode='rb')
         else:
             print("Unrecognized file type: %s" % (file))
             return images, metadata_dict_list, problematic, file, error_message
@@ -164,7 +167,7 @@ def __themis_readfile_worker(file):
 
             # split dictionaries up per frame, exposure plus initial readout is
             # always the end of metadata for frame
-            if (key.startswith("Exposure plus initial readout")):
+            if (key.startswith("Exposure plus initial readout") or key.startswith("Exposure duration plus readout")):
                 metadata_dict_list.append(metadata_dict)
                 metadata_dict = {}
         elif line == b'65535\n':
