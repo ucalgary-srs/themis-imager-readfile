@@ -10,6 +10,7 @@ from multiprocessing import Pool
 THEMIS_IMAGE_SIZE_BYTES = 131072
 THEMIS_DT = np.dtype("uint16")
 THEMIS_DT = THEMIS_DT.newbyteorder('>')  # force big endian byte ordering
+THEMIS_EXPECTED_MINUTE_NUM_FRAMES = 20
 
 
 def read(file_list, workers=1):
@@ -24,12 +25,6 @@ def read(file_list, workers=1):
     :return: images, metadata dictionaries, and problematic files
     :rtype: numpy.ndarray, list[dict], list[dict]
     """
-    # pre-allocate array sizes (optimization)
-    predicted_num_frames = len(file_list) * 20
-    images = np.empty([256, 256, predicted_num_frames], dtype=THEMIS_DT)
-    metadata_dict_list = [{}] * predicted_num_frames
-    problematic_file_list = []
-
     # set up process pool (ignore SIGINT before spawning pool so child processes inherit SIGINT handler)
     original_sigint_handler = signal.signal(signal.SIGINT, signal.SIG_IGN)
     pool = Pool(processes=workers)
@@ -50,7 +45,17 @@ def read(file_list, workers=1):
     else:
         pool.close()
 
-    # reorganize data
+    # derive number of frames to prepare for
+    total_num_frames = 0
+    for i in range(0, len(data)):
+        total_num_frames += data[i][0].shape[2]
+
+    # pre-allocate array sizes
+    images = np.empty([256, 256, total_num_frames], dtype=THEMIS_DT)
+    metadata_dict_list = [{}] * total_num_frames
+    problematic_file_list = []
+
+    # populate data
     list_position = 0
     for i in range(0, len(data)):
         # check if file was problematic
@@ -75,7 +80,7 @@ def read(file_list, workers=1):
 
     # trim unused elements from predicted array sizes
     metadata_dict_list = metadata_dict_list[0:list_position]
-    images = np.delete(images, range(list_position, predicted_num_frames), axis=2)
+    images = np.delete(images, range(list_position, total_num_frames), axis=2)
 
     # ensure entire array views as uint16
     images = images.astype(np.uint16)
