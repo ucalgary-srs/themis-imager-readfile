@@ -48,6 +48,8 @@ def read(file_list, workers=1):
     # derive number of frames to prepare for
     total_num_frames = 0
     for i in range(0, len(data)):
+        if (data[i][2] is True):
+            continue
         total_num_frames += data[i][0].shape[2]
 
     # pre-allocate array sizes
