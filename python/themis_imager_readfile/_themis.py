@@ -112,6 +112,8 @@ def __themis_readfile_worker(file):
             unzipped = open(file, mode='rb')
         else:
             print("Unrecognized file type: %s" % (file))
+            problematic = True
+            error_message = "Unrecognized file type"
             return images, metadata_dict_list, problematic, file, error_message
     except Exception as e:
         print("Failed to open file '%s' " % (file))
