@@ -66,6 +66,7 @@ def read(file_list, workers=1):
                 "filename": data[i][3],
                 "error_message": data[i][4],
             })
+            continue
 
         # check if any data was read in
         if (len(data[i][1]) == 0):
@@ -145,14 +146,15 @@ def __themis_readfile_worker(file):
             try:
                 line_decoded = line.decode("ascii")
             except Exception as e:
-                # skip metadata line if it can't be decoded, likely corrupt file
-                print("Error decoding metadata line: %s (line='%s', file='%s')" % (str(e), line, file))
-                problematic = True
-                error_message = "error decoding metadata line: %s" % (str(e))
+                # skip metadata line if it can't be decoded, likely corrupt file but don't mark it as one yet
+                print("Warning: issue decoding metadata line: %s (line='%s', file='%s')" % (str(e), line, file))
                 continue
 
             # split the key and value out of the metadata line
             line_decoded_split = line_decoded.split('"')
+            if (len(line_decoded_split) != 3):
+                print("Warning: issue splitting metadata line (line='%s', file='%s')" % (line_decoded, file))
+                continue
             key = line_decoded_split[1]
             value = line_decoded_split[2].strip()
 
