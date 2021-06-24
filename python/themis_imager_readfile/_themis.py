@@ -206,5 +206,11 @@ def __themis_readfile_worker(file):
     # close gzip file
     unzipped.close()
 
+    # check to see if the image is empty
+    if (images.size == 0):
+        print("Error reading image file: found no image data")
+        problematic = True
+        error_message = "no image data"
+
     # return
     return images, metadata_dict_list, problematic, file, error_message
