@@ -10,6 +10,10 @@ IDL procedures for reading THEMIS All-Sky Imager (ASI) stream0 raw PGM-file data
 - IDL 6.0+ is required
 - Windows 7/10, Linux
 
+## Supported Datasets
+
+- THEMIS ASI raw: [stream0](https://data.phys.ucalgary.ca/sort_by_project/THEMIS/asi/stream0) PGM files
+
 ## Installation
 
 Download the programs and include in your IDL Path or compile manually as needed.
