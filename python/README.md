@@ -7,6 +7,10 @@
 
 Python library for reading THEMIS All-Sky Imager (ASI) stream0 raw PGM-file data. The data can be found at https://data.phys.ucalgary.ca or http://themis.igpp.ucla.edu/index.shtml.
 
+## Supported Datasets
+
+- THEMIS ASI raw: [stream0](https://data.phys.ucalgary.ca/sort_by_project/THEMIS/asi/stream0) PGM files
+
 ## Installation
 
 The themis-imager-readfile library is available on PyPI:
