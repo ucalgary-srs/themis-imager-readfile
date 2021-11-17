@@ -11,6 +11,7 @@ from multiprocessing import Pool
 THEMIS_IMAGE_SIZE_BYTES = 131072
 THEMIS_DT = np.dtype("uint16")
 THEMIS_DT = THEMIS_DT.newbyteorder('>')  # force big endian byte ordering
+THEMIS_EXPECTED_MINUTE_NUM_FRAMES = 20
 
 
 def read(file_list, workers=1):
@@ -25,12 +26,6 @@ def read(file_list, workers=1):
     :return: images, metadata dictionaries, and problematic files
     :rtype: numpy.ndarray, list[dict], list[dict]
     """
-    # pre-allocate array sizes (optimization)
-    predicted_num_frames = len(file_list) * 20
-    images = np.empty([256, 256, predicted_num_frames], dtype=THEMIS_DT)
-    metadata_dict_list = [{}] * predicted_num_frames
-    problematic_file_list = []
-
     # set up process pool (ignore SIGINT before spawning pool so child processes inherit SIGINT handler)
     original_sigint_handler = signal.signal(signal.SIGINT, signal.SIG_IGN)
     pool = Pool(processes=workers)
@@ -51,7 +46,19 @@ def read(file_list, workers=1):
     else:
         pool.close()
 
-    # reorganize data
+    # derive number of frames to prepare for
+    total_num_frames = 0
+    for i in range(0, len(data)):
+        if (data[i][2] is True):
+            continue
+        total_num_frames += data[i][0].shape[2]
+
+    # pre-allocate array sizes
+    images = np.empty([256, 256, total_num_frames], dtype=THEMIS_DT)
+    metadata_dict_list = [{}] * total_num_frames
+    problematic_file_list = []
+
+    # populate data
     list_position = 0
     for i in range(0, len(data)):
         # check if file was problematic
@@ -60,6 +67,7 @@ def read(file_list, workers=1):
                 "filename": data[i][3],
                 "error_message": data[i][4],
             })
+            continue
 
         # check if any data was read in
         if (len(data[i][1]) == 0):
@@ -76,7 +84,7 @@ def read(file_list, workers=1):
 
     # trim unused elements from predicted array sizes
     metadata_dict_list = metadata_dict_list[0:list_position]
-    images = np.delete(images, range(list_position, predicted_num_frames), axis=2)
+    images = np.delete(images, range(list_position, total_num_frames), axis=2)
 
     # ensure entire array views as uint16
     images = images.astype(np.uint16)
@@ -107,6 +115,8 @@ def __themis_readfile_worker(file):
             unzipped = bz2.open(file, mode='rb')
         else:
             print("Unrecognized file type: %s" % (file))
+            problematic = True
+            error_message = "Unrecognized file type"
             return images, metadata_dict_list, problematic, file, error_message
     except Exception as e:
         print("Failed to open file '%s' " % (file))
@@ -141,14 +151,15 @@ def __themis_readfile_worker(file):
             try:
                 line_decoded = line.decode("ascii")
             except Exception as e:
-                # skip metadata line if it can't be decoded, likely corrupt file
-                print("Error decoding metadata line: %s (line='%s', file='%s')" % (str(e), line, file))
-                problematic = True
-                error_message = "error decoding metadata line: %s" % (str(e))
+                # skip metadata line if it can't be decoded, likely corrupt file but don't mark it as one yet
+                print("Warning: issue decoding metadata line: %s (line='%s', file='%s')" % (str(e), line, file))
                 continue
 
             # split the key and value out of the metadata line
             line_decoded_split = line_decoded.split('"')
+            if (len(line_decoded_split) != 3):
+                print("Warning: issue splitting metadata line (line='%s', file='%s')" % (line_decoded, file))
+                continue
             key = line_decoded_split[1]
             value = line_decoded_split[2].strip()
 
@@ -201,6 +212,12 @@ def __themis_readfile_worker(file):
 
     # close gzip file
     unzipped.close()
+
+    # check to see if the image is empty
+    if (images.size == 0):
+        print("Error reading image file: found no image data")
+        problematic = True
+        error_message = "no image data"
 
     # return
     return images, metadata_dict_list, problematic, file, error_message
