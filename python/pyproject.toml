@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "themis-imager-readfile"
-version = "1.0.11"
+version = "1.1.0"
 description = "Read functions for THEMIS ASI PGM raw files"
 readme = "README.md"
 homepage = "https://github.com/ucalgary-aurora/themis-imager-readfile"
@@ -12,13 +12,13 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.6"
-numpy = "^1.19.2"
+python = "^3.8.1"
+numpy = "^1.24.0"
 
 [tool.poetry.dev-dependencies]
-pytest = "^5.2"
-flake8 = "^3.8.4"
-pylint = "^2.6.0"
+pytest = "^7.0.0"
+flake8 = "^6.0.0"
+pylint = "^2.16.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
