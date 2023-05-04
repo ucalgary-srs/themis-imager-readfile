@@ -21,7 +21,7 @@ $ python3 -m pip install themis-imager-readfile
 
 ## Supported Python Versions
 
-themis-imager-readfile officially supports Python 3.6+.
+themis-imager-readfile officially supports Python 3.8+.
 
 ## Examples
 
