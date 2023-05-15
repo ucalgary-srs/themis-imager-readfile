@@ -1,7 +1,3 @@
-__version__ = "1.1.3"
+__version__ = "1.1.4"
 
 from ._themis import read
-
-if (__name__ == "__main__"):
-    import multiprocessing
-    multiprocessing.freeze_support()

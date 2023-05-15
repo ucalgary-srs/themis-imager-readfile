@@ -5,7 +5,7 @@ import gzip
 import bz2
 import numpy as np
 import signal
-import multiprocessing
+from multiprocessing import Pool
 
 # globals
 THEMIS_IMAGE_SIZE_BYTES = 131072
@@ -28,7 +28,7 @@ def read(file_list, workers=1):
     """
     # set up process pool (ignore SIGINT before spawning pool so child processes inherit SIGINT handler)
     original_sigint_handler = signal.signal(signal.SIGINT, signal.SIG_IGN)
-    pool = multiprocessing.Pool(processes=workers)
+    pool = Pool(processes=workers)
     signal.signal(signal.SIGINT, original_sigint_handler)  # restore SIGINT handler
 
     # if input is just a single file name in a string, convert to a list to be fed to the workers
