@@ -27,7 +27,6 @@ def read(file_list, workers=1):
     :rtype: numpy.ndarray, list[dict], list[dict]
     """
     # set up process pool (ignore SIGINT before spawning pool so child processes inherit SIGINT handler)
-    multiprocessing.freeze_support()
     original_sigint_handler = signal.signal(signal.SIGINT, signal.SIG_IGN)
     pool = multiprocessing.Pool(processes=workers)
     signal.signal(signal.SIGINT, original_sigint_handler)  # restore SIGINT handler
