@@ -3,6 +3,7 @@ import bz2
 import signal
 import numpy as np
 from multiprocessing import Pool
+from functools import partial
 
 # globals
 THEMIS_IMAGE_SIZE_BYTES = 131072
@@ -11,7 +12,7 @@ THEMIS_DT = THEMIS_DT.newbyteorder('>')  # force big endian byte ordering
 THEMIS_EXPECTED_MINUTE_NUM_FRAMES = 20
 
 
-def read(file_list, workers=1):
+def read(file_list, workers=1, quiet=False):
     """
     Read in a single PGM file or set of PGM files
 
@@ -19,6 +20,8 @@ def read(file_list, workers=1):
     :type file_list: str
     :param workers: number of worker processes to spawn, defaults to 1
     :type workers: int, optional
+    :param quiet: reduce output while reading data
+    :type quiet: bool, optional
 
     :return: images, metadata dictionaries, and problematic files
     :rtype: numpy.ndarray, list[dict], list[dict]
@@ -43,7 +46,7 @@ def read(file_list, workers=1):
         # NOTE: structure of data - data[file][metadata dictionary lists = 1, images = 0][frame]
         data = []
         try:
-            data = pool.map(__themis_readfile_worker, file_list)
+            data = pool.map(partial(__themis_readfile_worker, quiet=quiet), file_list)
         except KeyboardInterrupt:
             pool.terminate()  # gracefully kill children
             return np.empty((0, 0, 0), dtype=THEMIS_DT), [], []
@@ -53,7 +56,7 @@ def read(file_list, workers=1):
         # don't bother using multiprocessing with one worker, just call the worker function directly
         data = []
         for f in file_list:
-            data.append(__themis_readfile_worker(f))
+            data.append(__themis_readfile_worker(f, quiet=quiet))
 
     # derive number of frames to prepare for
     total_num_frames = 0
@@ -103,7 +106,7 @@ def read(file_list, workers=1):
     return images, metadata_dict_list, problematic_file_list
 
 
-def __themis_readfile_worker(file):
+def __themis_readfile_worker(file, quiet=False):
     # init
     images = np.array([])
     metadata_dict_list = []
@@ -123,12 +126,14 @@ def __themis_readfile_worker(file):
         elif file.endswith("pgm.bz2"):
             unzipped = bz2.open(file, mode='rb')
         else:
-            print("Unrecognized file type: %s" % (file))
+            if (quiet is False):
+                print("Unrecognized file type: %s" % (file))
             problematic = True
             error_message = "Unrecognized file type"
             return images, metadata_dict_list, problematic, file, error_message
     except Exception as e:
-        print("Failed to open file '%s' " % (file))
+        if (quiet is False):
+            print("Failed to open file '%s' " % (file))
         problematic = True
         error_message = "failed to open file: %s" % (str(e))
         return images, metadata_dict_list, problematic, file, error_message
@@ -139,7 +144,8 @@ def __themis_readfile_worker(file):
         try:
             line = unzipped.readline()
         except Exception as e:
-            print("Error reading before image data in file '%s'" % (file))
+            if (quiet is False):
+                print("Error reading before image data in file '%s'" % (file))
             problematic = True
             metadata_dict_list = []
             images = np.array([])
@@ -161,13 +167,15 @@ def __themis_readfile_worker(file):
                 line_decoded = line.decode("ascii")
             except Exception as e:
                 # skip metadata line if it can't be decoded, likely corrupt file but don't mark it as one yet
-                print("Warning: issue decoding metadata line: %s (line='%s', file='%s')" % (str(e), line, file))
+                if (quiet is False):
+                    print("Warning: issue decoding metadata line: %s (line='%s', file='%s')" % (str(e), line, file))
                 continue
 
             # split the key and value out of the metadata line
             line_decoded_split = line_decoded.split('"')
             if (len(line_decoded_split) != 3):
-                print("Warning: issue splitting metadata line (line='%s', file='%s')" % (line_decoded, file))
+                if (quiet is False):
+                    print("Warning: issue splitting metadata line (line='%s', file='%s')" % (line_decoded, file))
                 continue
             key = line_decoded_split[1]
             value = line_decoded_split[2].strip()
@@ -206,7 +214,8 @@ def __themis_readfile_worker(file):
                 # change 1d numpy array into 256x256 matrix with correctly located pixels
                 image_matrix = np.reshape(image_np, (256, 256, 1))
             except Exception as e:
-                print("Failed reading image data frame: %s" % (str(e)))
+                if (quiet is False):
+                    print("Failed reading image data frame: %s" % (str(e)))
                 metadata_dict_list.pop()  # remove corresponding metadata entry
                 problematic = True
                 error_message = "image data read failure: %s" % (str(e))
@@ -224,7 +233,8 @@ def __themis_readfile_worker(file):
 
     # check to see if the image is empty
     if (images.size == 0):
-        print("Error reading image file: found no image data")
+        if (quiet is False):
+            print("Error reading image file: found no image data")
         problematic = True
         error_message = "no image data"
 
