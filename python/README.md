@@ -57,6 +57,14 @@ Import the library using `import themis_imager_readfile`
 >>> img, meta, problematic_files = themis_imager_readfile.read(file_list, workers=4)
 ```
 
+### Read with no output
+
+```python
+>>> import trex_imager_readfile, glob
+>>> file_list = glob.glob("path/to/files/2020/01/01/atha_themis02/ut06/*full.pgm*")
+>>> img, meta, problematic_files = themis_imager_readfile.read(file_list, workers=4, quiet=True)
+```
+
 ## Development
 
 Clone the repository and install dependencies using Poetry.
