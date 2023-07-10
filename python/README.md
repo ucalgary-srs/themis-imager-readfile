@@ -31,8 +31,6 @@ Example Python notebooks can be found in the "examples" directory. Further, some
 
 Import the library using `import themis_imager_readfile`
 
-**Warning**: On Windows, be sure to put any `read` calls into a `main()` method. This is because we utilize the multiprocessing library and the method of forking processes in Windows requires it. Note that if you're using Jupyter or other IPython-based interfaces, this is not required.
-
 ### Read a single file
 
 ```python
@@ -63,6 +61,37 @@ Import the library using `import themis_imager_readfile`
 >>> import themis_imager_readfile, glob
 >>> file_list = glob.glob("path/to/files/2020/01/01/atha_themis02/ut06/*full.pgm*")
 >>> img, meta, problematic_files = themis_imager_readfile.read(file_list, workers=4, quiet=True)
+```
+
+### Read only the first frame of each file
+
+```python
+>>> import themis_imager_readfile, glob
+>>> file_list = glob.glob("path/to/files/2020/01/01/atha_themis02/ut06/*full.pgm*")
+>>> img, meta, problematic_files = themis_imager_readfile.read(file_list, first_frame=True)
+```
+
+### Exclude reading the metadata
+
+```python
+>>> import themis_imager_readfile, glob
+>>> file_list = glob.glob("path/to/files/2020/01/01/atha_themis02/ut06/*full.pgm*")
+>>> img, meta, problematic_files = themis_imager_readfile.read(file_list, no_metadata=True)
+```
+
+## Multiprocessing Notes
+
+If you receive error messages about multiprocessing, be sure that your code is wrapped in a `main()` method. This usually resolves the issue. One example implementation is:
+
+```python
+import themis_imager_readfile
+
+def main():
+    filename = "path/to/data/2020/01/01/atha_themis02/ut06/20200101_0600_atha_themis02_full.pgm.gz"
+    img, meta, problematic_files = themis_imager_readfile.read(filename)
+
+if (__name__ == "__main__"):
+    main()
 ```
 
 ## Development
