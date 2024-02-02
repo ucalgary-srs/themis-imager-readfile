@@ -87,6 +87,10 @@ def test_read_multiple_files(test_dict):
     assert img.shape == (256, 256, test_dict["expected_frames"])
     assert len(meta) == test_dict["expected_frames"]
 
+    # check that there's metadata
+    for m in meta:
+        assert len(m) > 0
+
     # check dtype
     assert img.dtype == np.uint16
 
@@ -121,6 +125,10 @@ def test_read_single_file_workers(test_dict):
     # check number of frames
     assert img.shape == (256, 256, test_dict["expected_frames"])
     assert len(meta) == test_dict["expected_frames"]
+
+    # check that there's metadata
+    for m in meta:
+        assert len(m) > 0
 
     # check dtype
     assert img.dtype == np.uint16
@@ -220,6 +228,10 @@ def test_read_multiple_files_workers(test_dict):
     assert img.shape == (256, 256, test_dict["expected_frames"])
     assert len(meta) == test_dict["expected_frames"]
 
+    # check that there's metadata
+    for m in meta:
+        assert len(m) > 0
+
     # check dtype
     assert img.dtype == np.uint16
 
@@ -318,6 +330,10 @@ def test_read_first_frame(test_dict):
     # check number of frames
     assert img.shape == (256, 256, test_dict["expected_frames"])
     assert len(meta) == test_dict["expected_frames"]
+
+    # check that there's metadata
+    for m in meta:
+        assert len(m) > 0
 
     # check dtype
     assert img.dtype == np.uint16
