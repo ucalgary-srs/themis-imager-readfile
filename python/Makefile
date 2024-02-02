@@ -13,7 +13,7 @@ update upgrade:
 	poetry update
 
 clean:
-	@rm -rf rego_imager_readfile.egg-info build dist
+	@rm -rf themis_imager_readfile.egg-info build dist
 
 test: test-linting
 
@@ -34,7 +34,7 @@ test-pycodestyle:
 	@printf "\n\n"
 	
 test-pytest pytest:
-	poetry run pytest
+	pytest -n 2 --maxfail=1
 
 publish:
 	${MAKE} test
