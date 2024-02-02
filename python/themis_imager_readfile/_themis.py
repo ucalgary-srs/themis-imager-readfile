@@ -12,7 +12,11 @@ THEMIS_DT = THEMIS_DT.newbyteorder('>')  # force big endian byte ordering
 THEMIS_EXPECTED_MINUTE_NUM_FRAMES = 20
 
 
-def read(file_list, workers=1, first_frame=False, no_metadata=False, quiet=False):
+def read(file_list,
+         workers=1,
+         first_frame=False,
+         no_metadata=False,
+         quiet=False):
     """
     Read in a single PGM file or set of PGM files
 
@@ -39,9 +43,11 @@ def read(file_list, workers=1, first_frame=False, no_metadata=False, quiet=False
     if (workers > 1):
         try:
             # set up process pool (ignore SIGINT before spawning pool so child processes inherit SIGINT handler)
-            original_sigint_handler = signal.signal(signal.SIGINT, signal.SIG_IGN)
+            original_sigint_handler = signal.signal(signal.SIGINT,
+                                                    signal.SIG_IGN)
             pool = Pool(processes=workers)
-            signal.signal(signal.SIGINT, original_sigint_handler)  # restore SIGINT handler
+            signal.signal(signal.SIGINT,
+                          original_sigint_handler)  # restore SIGINT handler
         except ValueError:
             # likely the read call is being used within a context that doesn't support the usage
             # of signals in this way, proceed without it
@@ -51,11 +57,11 @@ def read(file_list, workers=1, first_frame=False, no_metadata=False, quiet=False
         # NOTE: structure of data - data[file][metadata dictionary lists = 1, images = 0][frame]
         data = []
         try:
-            data = pool.map(partial(__themis_readfile_worker,
-                                    first_frame=first_frame,
-                                    no_metadata=no_metadata,
-                                    quiet=quiet),
-                            file_list)
+            data = pool.map(
+                partial(__themis_readfile_worker,
+                        first_frame=first_frame,
+                        no_metadata=no_metadata,
+                        quiet=quiet), file_list)
         except KeyboardInterrupt:
             pool.terminate()  # gracefully kill children
             return np.empty((0, 0, 0), dtype=THEMIS_DT), [], []
@@ -66,10 +72,11 @@ def read(file_list, workers=1, first_frame=False, no_metadata=False, quiet=False
         # don't bother using multiprocessing with one worker, just call the worker function directly
         data = []
         for f in file_list:
-            data.append(__themis_readfile_worker(f,
-                                                 first_frame=first_frame,
-                                                 no_metadata=no_metadata,
-                                                 quiet=quiet))
+            data.append(
+                __themis_readfile_worker(f,
+                                         first_frame=first_frame,
+                                         no_metadata=no_metadata,
+                                         quiet=quiet))
 
     # derive number of frames to prepare for
     total_num_frames = 0
@@ -103,8 +110,10 @@ def read(file_list, workers=1, first_frame=False, no_metadata=False, quiet=False
         real_num_frames = data[i][0].shape[2]
 
         # metadata dictionary list at data[][1]
-        metadata_dict_list[list_position:list_position + real_num_frames] = data[i][1]
-        images[:, :, list_position:list_position + real_num_frames] = data[i][0]  # image arrays at data[][0]
+        metadata_dict_list[list_position:list_position +
+                           real_num_frames] = data[i][1]
+        images[:, :, list_position:list_position +
+               real_num_frames] = data[i][0]  # image arrays at data[][0]
         list_position = list_position + real_num_frames  # advance list position
 
     # trim unused elements from predicted array sizes
@@ -119,7 +128,10 @@ def read(file_list, workers=1, first_frame=False, no_metadata=False, quiet=False
     return images, metadata_dict_list, problematic_file_list
 
 
-def __themis_readfile_worker(file, first_frame=False, no_metadata=False, quiet=False):
+def __themis_readfile_worker(file,
+                             first_frame=False,
+                             no_metadata=False,
+                             quiet=False):
     # init
     images = np.array([])
     metadata_dict_list = []
@@ -189,14 +201,21 @@ def __themis_readfile_worker(file, first_frame=False, no_metadata=False, quiet=F
                 except Exception as e:
                     # skip metadata line if it can't be decoded, likely corrupt file but don't mark it as one yet
                     if (quiet is False):
-                        print("Warning: issue decoding metadata line: %s (line='%s', file='%s')" % (str(e), line, file))
+                        print(
+                            "Error decoding metadata line: %s (line='%s', file='%s')"
+                            % (str(e), line, file))
+                    problematic = True
+                    error_message = "error decoding metadata line: %s" % (
+                        str(e))
                     continue
 
                 # split the key and value out of the metadata line
                 line_decoded_split = line_decoded.split('"')
                 if (len(line_decoded_split) != 3):
                     if (quiet is False):
-                        print("Warning: issue splitting metadata line (line='%s', file='%s')" % (line_decoded, file))
+                        print(
+                            "Warning: issue splitting metadata line (line='%s', file='%s')"
+                            % (line_decoded, file))
                     continue
                 key = line_decoded_split[1]
                 value = line_decoded_split[2].strip()
@@ -216,7 +235,8 @@ def __themis_readfile_worker(file, first_frame=False, no_metadata=False, quiet=F
 
                 # split dictionaries up per frame, exposure plus initial readout is
                 # always the end of metadata for frame
-                if (key.startswith("Exposure plus initial readout") or key.startswith("Exposure duration plus readout")):
+                if (key.startswith("Exposure plus initial readout")
+                        or key.startswith("Exposure duration plus readout")):
                     metadata_dict_list.append(metadata_dict)
                     metadata_dict = {}
         elif line == b'65535\n':
@@ -247,7 +267,8 @@ def __themis_readfile_worker(file, first_frame=False, no_metadata=False, quiet=F
                 images = image_matrix
                 is_first = False
             else:
-                images = np.dstack([images, image_matrix])  # depth stack images (on 3rd axis)
+                images = np.dstack([images, image_matrix
+                                    ])  # depth stack images (on 3rd axis)
 
     # close gzip file
     unzipped.close()
