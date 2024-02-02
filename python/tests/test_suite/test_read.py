@@ -21,6 +21,11 @@ DATA_DIR = "%s/data" % (os.path.dirname(os.path.realpath(__file__)))
         "expected_success": True,
         "expected_frames": 20
     },
+    {
+        "filename": "20140310_0605_gill_themis19_full.pgm",
+        "expected_success": True,
+        "expected_frames": 20
+    },
 ])
 def test_read_single_file(test_dict):
     # read file
@@ -50,11 +55,27 @@ def test_read_single_file(test_dict):
     },
     {
         "filenames": [
+            "20140310_0605_gill_themis19_full.pgm",
+        ],
+        "expected_success": True,
+        "expected_frames": 20
+    },
+    {
+        "filenames": [
             "20140310_0600_gill_themis19_full.pgm.gz",
             "20140310_0601_gill_themis19_full.pgm.gz",
         ],
         "expected_success": True,
         "expected_frames": 40
+    },
+    {
+        "filenames": [
+            "20140310_0600_gill_themis19_full.pgm.gz",
+            "20140310_0601_gill_themis19_full.pgm.gz",
+            "20140310_0605_gill_themis19_full.pgm",
+        ],
+        "expected_success": True,
+        "expected_frames": 60
     },
     {
         "filenames": [
@@ -275,6 +296,16 @@ def test_read_multiple_files_workers(test_dict):
         "filenames": [
             "20140310_0600_gill_themis19_full.pgm.gz",
             "20140310_0601_gill_themis19_full.pgm.gz",
+            "20140310_0605_gill_themis19_full.pgm",
+        ],
+        "workers": 2,
+        "expected_success": True,
+        "expected_frames": 3
+    },
+    {
+        "filenames": [
+            "20140310_0600_gill_themis19_full.pgm.gz",
+            "20140310_0601_gill_themis19_full.pgm.gz",
             "20140310_0602_gill_themis19_full.pgm.gz",
             "20140310_0603_gill_themis19_full.pgm.gz",
             "20140310_0604_gill_themis19_full.pgm.gz",
@@ -356,6 +387,16 @@ def test_read_first_frame(test_dict):
         "workers": 2,
         "expected_success": True,
         "expected_frames": 40
+    },
+    {
+        "filenames": [
+            "20140310_0600_gill_themis19_full.pgm.gz",
+            "20140310_0601_gill_themis19_full.pgm.gz",
+            "20140310_0605_gill_themis19_full.pgm",
+        ],
+        "workers": 3,
+        "expected_success": True,
+        "expected_frames": 60
     },
     {
         "filenames": [
