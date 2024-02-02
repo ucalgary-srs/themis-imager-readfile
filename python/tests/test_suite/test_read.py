@@ -6,9 +6,6 @@ import themis_imager_readfile
 # globals
 DATA_DIR = "%s/data" % (os.path.dirname(os.path.realpath(__file__)))
 
-# tests
-#  - no meta
-
 
 @pytest.mark.parametrize("test_dict", [
     {
