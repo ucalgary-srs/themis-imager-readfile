@@ -146,12 +146,20 @@ def __themis_readfile_worker(file, first_frame=False, no_metadata=False, quiet=F
                 print("Unrecognized file type: %s" % (file))
             problematic = True
             error_message = "Unrecognized file type"
+            try:
+                unzipped.close()
+            except Exception:
+                pass
             return images, metadata_dict_list, problematic, file, error_message
     except Exception as e:
         if (quiet is False):
             print("Failed to open file '%s' " % (file))
         problematic = True
         error_message = "failed to open file: %s" % (str(e))
+        try:
+            unzipped.close()
+        except Exception:
+            pass
         return images, metadata_dict_list, problematic, file, error_message
 
     # read the file
@@ -170,6 +178,10 @@ def __themis_readfile_worker(file, first_frame=False, no_metadata=False, quiet=F
             metadata_dict_list = []
             images = np.array([])
             error_message = "error reading before image data: %s" % (str(e))
+            try:
+                unzipped.close()
+            except Exception:
+                pass
             return images, metadata_dict_list, problematic, file, error_message
 
         # break loop at end of file
